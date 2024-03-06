@@ -1,5 +1,87 @@
+:root {
+    --ascent-color: #CAC4CE;
+    --ascent-color-2: #9f99a4;
+    --ascent-color-3: #58525b;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+}
+
+.page {
+    background: url(../images/blob.svg) no-repeat center center fixed;
+    background-size: cover;
+    background-color: var(--ascent-color);
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.game-board-container {
+    display: grid;
+    text-align: center;
+    place-items: center;
+    gap: 0.5rem;
+}
+
+.game-board {
+    width: min(90vw, 90vh);
+    max-width: 20rem;
+    height: min(90vw, 90vh);
+    max-height: 20rem;
+
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+    border-radius: 8px;
+}
+
+.game-cell {
+    font-size: 3.5rem;
+    font-weight: bold;
+    user-select: none;
+
+    display: grid;
+    place-content: center;
+    overflow: hidden;
+
+    background-color: var(--ascent-color);
+    border-radius: 8px;
+    transition: transform 0.1s ease-out;
+}
+
+.game-cell.open:hover {
+    transform: scale(1.05);
+    background-color: var(--ascent-color-2);
+    box-shadow: 0 0 10px var(--ascent-color);
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    column-gap: 0.5ch;
+}
+
+.game-board-container .settings {
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.game-board-container .settings:hover {
+    transform: rotate(45deg);
 }
