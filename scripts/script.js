@@ -283,3 +283,214 @@ const game = (function(board) {
 })(board);
 
 
+const display = (function() {
+
+    const score1 = document.querySelector(".score-1");
+    const score2 = document.querySelector(".score-2");
+    let cells = "";
+
+    const setCells = (cellsParam) => cells = cellsParam;
+
+    const newGame = () => {
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].classList.add("open");
+            cells[i].classList.remove("taken");
+            cells[i].innerHTML = "";
+        }
+    };
+
+    const place = (position, marker) => {
+        cells[position].innerHTML = marker;
+        cells[position].classList.remove("open");
+        cells[position].classList.add("taken");
+    };
+
+    const botPlace = (position, marker) => {
+        setTimeout(() => {
+            cells[position].innerHTML = marker;
+            cells[position].classList.add("bot-hover");
+        }, 200);
+
+        setTimeout(() => {
+            cells[position].classList.remove("bot-hover");
+            cells[position].classList.remove("open");
+            cells[position].classList.add("taken");
+        }, 500);
+    };
+
+    const updateScore = (s1, s2) => {
+        score1.innerHTML = s1;
+        score2.innerHTML = s2;
+    };
+
+    return { setCells, newGame, place, botPlace, updateScore };
+})();
+
+
+const menu = (function(game, display, bot) {
+
+    const pvpButton = document.getElementById("pvp");
+    const pvaiButton = document.getElementById("pvai");
+    const newGameButton = document.querySelector(".new-game");
+    const menuContainer = document.querySelector(".menu-container");
+    const settingsButton = document.querySelector(".settings");
+    const winMenuContainer = document.querySelector(".win-menu-container");
+    const winnerSpan = document.querySelector(".winner");
+    const nextPlayerSpan = document.querySelector(".next-player");
+    const page = document.querySelector(".page");
+    const aiModeImg = document.querySelector(".ai-mode");
+
+    const start = () => {
+        startMainMenu();
+        startWinMenu();
+        startInGameSettings();
+    };
+
+    const startMainMenu = () => {
+        pvpButton.addEventListener("click", () => {
+            pvaiButton.classList.remove("active");
+            pvpButton.classList.add("active");
+            aiModeImg.src = "images/ai.svg";
+            game.mode("pvp");
+        });
+
+        pvaiButton.addEventListener("click", () => {
+            pvpButton.classList.remove("active");
+            pvaiButton.classList.add("active");
+            aiModeImg.src = "images/ai-easy.svg";
+            game.mode("pvai");
+        });
+
+        newGameButton.addEventListener("click", () => {
+            menuContainer.classList.remove("active");
+            newGame();
+        });
+
+        menuContainer.addEventListener("click", ev => {
+            if (ev.target !== menuContainer) {
+                return;
+            }
+            menuContainer.classList.remove("active");
+        });
+    };
+
+    const startWinMenu = () => {
+        winMenuContainer.addEventListener("click", () => {
+            page.classList.remove("blur");
+            winMenuContainer.classList.remove("active");
+
+            const next = game.nextTurn();
+            game.nextMatch();
+            display.newGame();
+
+            // If player vs bot and bot's turn, bot will make a move
+            if (game.getMode() !== "pvp" && next === "Player 2") {
+                pos = bot.think(game.getBoard(), "O");
+                game.place(pos);
+                display.botPlace(pos, "O");
+            }
+        });
+    };
+
+    const startInGameSettings = () => {
+        settingsButton.addEventListener("click", () => {
+            menuContainer.classList.add("active");
+        });
+    };
+
+    const newGame = () => {
+        game.newGame();
+        display.newGame();
+        display.updateScore(...game.getScore());
+    };
+
+    const showWinner = () => {
+        page.classList.add("blur");
+
+        const winner = game.getWinner();
+        if (winner === "Player 1") {
+            winnerSpan.innerHTML = "Player 1 won!";
+        } else if (winner === "Player 2") {
+            winnerSpan.innerHTML = "Player 2 won!";
+        } else {
+            winnerSpan.innerHTML = "Draw!";
+        }
+
+        nextPlayerSpan.innerHTML = game.nextTurn();
+
+        winMenuContainer.classList.add("active");
+    };
+
+    return { start, showWinner };
+
+})(game, display, bot);
+
+
+const main = (function(game, menu, display, bot) {
+
+    const cells = document.querySelectorAll(".game-cell");
+
+    const startGame = () => {
+        initDisplay();
+        menu.start();
+    };
+
+    const initDisplay = () => {
+        display.setCells(cells);
+        bindCellsEvents();
+    };
+
+    const bindCellsEvents = () => {
+        for (let i = 0; i < cells.length; i++) {
+            bindCellEvent(cells[i]);
+        };
+    };
+
+    const bindCellEvent = (cell) => {
+        cell.addEventListener("click", () => {
+            let pos = cell.id;
+            place(pos);
+        });
+    };
+
+    const place = (pos) => {
+        if (!game.valid(pos)) {
+            return;
+        }
+
+        let marker = game.place(pos);
+        display.place(pos, marker);
+
+        if (checkGameOver()) {
+            return;
+        }
+
+        if (game.getMode() !== "pvp" && marker === "X") {
+            botPlace("O");
+        }
+
+        checkGameOver();
+    };
+
+    const botPlace = (marker) => {
+        let pos = bot.think(game.getBoard(), marker);
+        game.place(pos);
+        display.botPlace(pos, marker);
+    };
+
+    const checkGameOver = () => {
+        if (game.over()) {
+            display.updateScore(...game.getScore());
+            menu.showWinner();
+            return true;
+        }
+
+        return false;
+    };
+
+    return { startGame };
+
+})(game, menu, display, bot);
+
+
+main.startGame();
