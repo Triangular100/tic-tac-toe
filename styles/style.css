@@ -10,6 +10,15 @@
     box-sizing: border-box;
 }
 
+button {
+    display: block;
+    font-family: inherit;
+    font-size: 100%;
+    border: none;
+    width: 100%;
+    background-color: inherit;
+}
+
 body {
     font-family: "Kdam Thmor Pro", sans-serif;
     height: 100vh;
@@ -27,6 +36,13 @@ body {
     justify-content: center;
     align-items: center;
 
+    transition: all 0.5s ease-out;
+}
+
+.page.blur {
+    backdrop-filter: blur(5px);
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
 }
 
 .game-board-container {
@@ -63,10 +79,15 @@ body {
     transition: transform 0.1s ease-out;
 }
 
-.game-cell.open:hover {
+.game-cell.open:hover,
+.game-cell.bot-hover {
     transform: scale(1.05);
     background-color: var(--ascent-color-2);
     box-shadow: 0 0 10px var(--ascent-color);
+}
+
+.game-cell.taken {
+    transition: all 1s;
 }
 
 .stats {
@@ -85,4 +106,95 @@ body {
 
 .game-board-container .settings:hover {
     transform: rotate(45deg);
+}
+
+.menu-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.menu-container.active {
+    display: flex;
+}
+
+.menu {
+    background-color: var(--ascent-color);
+    width: 100%;
+    max-width: 20rem;
+    height: 100%;
+    max-height: 20rem;
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.win-menu-container {
+    background: none;
+}
+
+.win-menu {
+    font-size: 1.2rem;
+    font-weight: bold;
+
+    width: 100%;
+    max-width: 14rem;
+    height: 100%;
+    max-height: 10rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    background-color: rgba(67, 63, 71, 0.9);
+    color: white;
+    border-radius: 8px;
+
+}
+
+.menu-option {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+
+    background-color: white;
+    border: 3px solid rgba(0, 0, 0, 0);
+    border-radius: 8px;
+}
+
+.menu-option.active {
+    border: 3px solid black;
+    box-shadow: -5px 5px 10px var(--ascent-color-3);
+}
+
+.menu-option:hover,
+.menu .new-game:hover {
+    border: 3px solid var(--ascent-color-3);
+}
+
+.menu-option img {
+    width: 3rem;
+    height: 3rem;
+}
+
+.menu-option .vs {
+    width: 1.7rem;
+    height: 1.7rem;
+}
+
+.menu .new-game {
+    background-color: white;
+    border: 3px solid rgba(0, 0, 0, 0);
+    border-radius: 8px;
 }
